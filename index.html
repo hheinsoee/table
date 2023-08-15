@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Data Table</title>
+    <script src="./v1.0.0/assets/dataTable/script.js"></script>
+    <script src="./v1.0.0/assets/jquery/jquery-3.6.1.min.js"></script>
+    <link rel="stylesheet" href="./v1.0.0/assets/dataTable/style.css">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        body.dark {
+            background-color: #111;
+            color: #aaa;
+        }
+        .border{
+            border:1px solid #0099ff;
+        }
+    </style>
+</head>
+
+<body class="dark">
+    <script>
+        var userList = [
+            { id: 1, name: "Kyaw Soe", age: 19, height: '30cm' },
+            { id: 2, image: 'https://avatars.githubusercontent.com/u/35089574?v=4', name: "Hein Soe", age: 29 },
+            { id: 3, name: "Japan Gree", age: 19 },
+            { id: 4, name: "Moe Kyaw Soe", age: 24 },
+        ];
+    </script>
+    <span onclick='$("body").toggleClass("dark");'>Change dark or light</span>
+
+
+    <h2>simple</h2>
+    <div id="simple"></div>
+    <script>
+        TheTable(
+            {
+                element: '#simple',
+                data: userList,
+                name: "simple",
+            }
+        )
+    </script>
+
+<h2>Loading..</h2>
+<div id="skeketon"></div>
+<script>
+    TheTable(
+        {
+            element: '#skeketon',
+            name: "user table",
+            cols: [
+                { key: 'id', label: 'ID'},
+                { key: 'image', label: "photo"},
+                { key: 'name', label: 'Full Name'},
+                { key: 'age', label: 'Age'}
+            ]
+        }
+    )
+</script>
+
+
+<h2>render</h2>
+<div id="render"></div>
+<script>
+    TheTable(
+        {
+            element: '#render',
+            data: userList,
+            name: "user table",
+            cols: [
+                { key: 'id', label: 'ID'},
+                { key: 'girl', label: 'စော်ရှိမရှိ', render: (a) => a.girl ? "ရှိပါရေ" : "<span style='color:#a44'>မရှိပါ</span>" },
+                { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "" },
+                { key: 'name', label: 'Full Name', render: (data) => `${data.name}` },
+                { key: 'age', label: 'Age', render: (data) => `${data.age} year`}
+            ]
+        }
+    )
+</script>
+
+
+    <h2>Style</h2>
+    <div id="style"></div>
+    <script>
+        TheTable(
+            {
+                element: '#style',
+                data: userList,
+                name: "user table",
+                cols: [
+                    { key: 'id', label: 'ID', css: 'text-align:right'},
+                    { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "" },
+                    { key: 'name', label: 'Full Name', render: (data) => `${data.name}` },
+                    { key: 'age', label: 'Age', render: (data) => `${data.age} year`, className: "border", css: "color:#0099ff" }
+                ]
+            }
+        )
+    </script>
+
+    <h2>advance</h2>
+    <div id="advance"></div>
+    <script>
+        var userList = [
+            { id: 1, name: "Kyaw Soe", age: 19, height: '30cm', girl: true },
+            { id: 2, image: 'https://avatars.githubusercontent.com/u/35089574?v=4', name: "Hein Soe", age: 29 },
+            { id: 3, name: "Japan Gree", age: 19 },
+            { id: 4, name: "Moe Kyaw Soe", age: 24, weight: "40kg" },
+        ];
+        TheTable(
+            {
+                element: '#advance',
+                data: userList,
+                name: "user table",
+                cols: [
+                    { key: 'id', label: 'ID', css: 'text-align:right', sort: false },
+                    { key: 'girl', label: 'စော်ရှိမရှိ', render: (a) => a.girl ? "ရှိပါရေ" : "<span style='color:#a44'>မရှိပါ</span>" },
+                    { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "" },
+                    { key: 'name', label: 'Full Name', render: (data) => `${data.name}` },
+                    { key: 'age', label: 'Age', render: (data) => `${data.age} year`, className: "red", css: "color:#0099ff" },
+                    { key: 'function', label: 'function', render: (data) => `${data.age > 20 ? '<span style="color:red">Old</span>' : '<span style="color:green">Young</span>'}`, },
+                    { key: 'action', label: '', render: (data) => `<span onclick='alert("${data.age > 20 ? 'U ' : 'Mg '} ${data.name} is ${data.age} years old.")'>click</span>` }
+                ],
+                defaultHide: ['age']
+            }
+        )
+    </script>
+
+</body>
+
+</html>

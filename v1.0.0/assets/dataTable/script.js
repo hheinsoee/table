@@ -11,6 +11,7 @@
 // ===============================================
 
 const TheTable = (props) => {
+  var defaultHide = props.defaultHide || [];
   var cols = [];
   var loading = !$.isArray(props.data);
   var rows = $.isArray(props.data) ? props.data : [];
@@ -26,21 +27,19 @@ const TheTable = (props) => {
   uniqueKeys.forEach((key) => {
     var colSetting = props.cols && props.cols.find((col) => col.key == key);
     colSetting
-      ? cols.push({ ...colSetting, show: true })
+      ? cols.push({
+          ...colSetting,
+          sort: false,
+        })
       : cols.push({
           key: key,
         });
   });
-  if (props.cols) {
-    props.cols.forEach((p) => {
-      if (!cols.find((col) => col.key == p.key)) {
-        p.show = true;
-        p.sort = false;
-        cols.push(p);
-        // console.log(p)
-      }
-    });
-  }
+  props.cols?.forEach((col) => {
+    if (!uniqueKeys.includes(col.key)) {
+      cols.push(col);
+    }
+  });
 
   const $topPanel = $("<div>").addClass("topPanel");
   const $tableContainer = $("<div>").addClass("tableContainer");
@@ -88,14 +87,19 @@ const TheTable = (props) => {
   //colum toggle start
   cols.forEach((c, i) => {
     const $checkBox = $("<label>").html(
-      `<input type="checkbox" ${c.show && "checked"}/><span>${
-        c.label || c.key
-      }</span>`
+      `<input type="checkbox" ${
+        (!defaultHide || !defaultHide.includes(c.key)) && "checked"
+      }/><span>${c.label || c.key}</span>`
     );
     $checkBox.addClass("noselect");
     $checkBox.on(
       "change",
-      () => ((cols[i].show = !cols[i].show), renderTable())
+      () => (
+        defaultHide.includes(c.key)
+          ? defaultHide.splice($.inArray(c.key, defaultHide), 1)
+          : defaultHide.push(c.key),
+        renderTable()
+      )
     );
     $columsToggle.append($checkBox);
   });
@@ -131,18 +135,19 @@ const TheTable = (props) => {
     const $thead = $("<thead>");
     const $theadRow = $("<tr>");
     cols.forEach((col) => {
-      if (col.show) {
+      console.log();
+      if (!defaultHide || !defaultHide.includes(col.key)) {
         const $th = $(`<th ${col.css ? `style=${col.css}` : ""}>`).html(
           `${col.label ? col.label : col.key} ${
             sort.key == col.key ? (sort.asc ? "&#8964" : "&#8963") : ""
           }`
         );
         // Attach sorting event listener
-        if (col.sort == undefined && col.sort == null){
-          $th.on("click", () => mySort(col.key, !sort.asc))
-        }else{
-          col.sort && $th.on("click", () => mySort(col.key, !sort.asc))
-        };
+        if (col.sort == undefined && col.sort == null) {
+          $th.on("click", () => mySort(col.key, !sort.asc));
+        } else {
+          col.sort && $th.on("click", () => mySort(col.key, !sort.asc));
+        }
         $theadRow.append($th);
       }
     });
@@ -152,11 +157,10 @@ const TheTable = (props) => {
 
     const $tbody = $("<tbody>");
     if (loading) {
-      console.log("loading");
       for (let i = 0; i <= pagLimit; i++) {
         const $tbodyRow = $("<tr>");
         cols.forEach((col) => {
-          if (col.show) {
+          if (!defaultHide || !defaultHide.includes(col.key)) {
             const $td = $(`<td>`).html("<div class='skeleton'></div>");
             $tbodyRow.append($td);
           }
@@ -168,7 +172,7 @@ const TheTable = (props) => {
         if (i >= startIndex && i < endIndex) {
           const $tbodyRow = $("<tr>");
           cols.forEach((col) => {
-            if (col.show) {
+            if (!defaultHide || !defaultHide.includes(col.key)) {
               const $td = $(
                 `<td 
               ${col.className ? `class=${col.className}` : ""} 
