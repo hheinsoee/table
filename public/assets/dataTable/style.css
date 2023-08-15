@@ -1,0 +1,193 @@
+/* ===============================================
+   styles.css - Styles for Data Table
+   ===============================================
+   
+   This stylesheet contains custom styles for a data table.
+   
+   Author: Hein Soe
+   GitHub: https://github.com/hheinsoee
+   Date: 2023-08-15
+   =============================================== */
+
+.tableContainer {
+    padding: 5px 10px;
+}
+.theTable {
+    font-family: Arial, Helvetica, sans-serif;
+    border-spacing: 0;
+    cursor: default;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    border-radius: 0.3rem;
+    font-size: 11pt;
+}
+.theTable tbody tr:nth-child(odd) {
+    background-color: rgba(50%, 50%, 50%, 0.07);
+}
+.theTable tbody tr:hover {
+    background-color: rgba(50%, 50%, 50%, 0.2);
+}
+.theTable thead {
+    background-color: rgba(189, 189, 189, 0.582);
+}
+.theTable thead,
+.noselect {
+    user-select: none;
+}
+.theTable th,
+.theTable td {
+    padding: 0rem 0.6rem;
+    height: 36px;
+    align-items: center;
+    text-align: left;
+}
+.theTable caption {
+    opacity: 0.7;
+}
+.columsToggle,
+.paganition {
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
+    list-style: none;
+    margin-inline-start: 0px;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    padding-inline-start: 0px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 0.3rem;
+    overflow: hidden;
+}
+
+.columsToggle label:first-child {
+    border: none;
+}
+input[type="search"] {
+    border: none;
+    border-radius: 0.3rem;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 3px 8px;
+    outline: none;
+    background-color: transparent;
+    color: inherit;
+}
+input[type="search"]:focus-visible {
+    box-shadow: 0px 8px 17px rgba(0, 0, 0, 0.2);
+}
+.paganition li {
+    padding: 0.2rem 0.6rem;
+    /* min-width: 2rem; */
+    border-left: 1pt solid #99999981;
+    cursor: pointer;
+}
+.paganition li.active {
+    background-color: #9999996b;
+}
+.paganition li:hover {
+    background-color: #99999962;
+}
+.paganition li:first-child {
+    border: none;
+}
+.topPanel,
+.bottomPanel {
+    background-color: #ffffff79;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    z-index: 10;
+    padding: 5px 10px;
+    backdrop-filter: blur(10px);
+}
+.topPanel {
+    top: 0;
+}
+.bottomPanel {
+    bottom: 0;
+}
+.rowsperpage {
+    display: flex;
+    align-items: first baseline;
+    gap: 5px;
+}
+.avatar {
+    border-radius: 50%;
+    height: 2rem;
+    width: 2rem;
+    object-fit: cover;
+    object-position: center;
+    background-color: rgba(50%, 50%, 50%, 0.3);
+    margin-bottom: -7px;
+}
+
+.columsToggle label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    border-left: 1pt solid #99999981;
+}
+.columsToggle label span {
+    background-color: #eeeeee;
+    padding: 0px 8px;
+    opacity: 0.6;
+    text-decoration: line-through;
+}
+.theTableContainer input[type="checkbox"] {
+    display: none;
+}
+.theTableContainer input:checked ~ span {
+    background-color: #ffffff;
+    opacity: 1;
+    text-decoration: none;
+}
+@keyframes blink {
+    0%,
+    50%,
+    100% {
+        opacity: 1;
+    }
+    25%,
+    75% {
+        opacity: 0.5;
+    }
+}
+.skeleton {
+    animation: blink 2s infinite;
+    height: 1rem;
+    border-radius: 50px;
+    background-color: rgba(50%, 50%, 50%, 20%);
+    transition: 1s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+.dark .theTableContainer {
+    color: #aaaaaa;
+}
+
+.dark .theTable thead {
+    background-color: #333333;
+    color: #dedede;
+}
+.dark .theTableContainer .topPanel,
+.dark .theTableContainer .bottomPanel {
+    background-color: #33333357;
+    color: #dedede;
+}
+
+.dark .theTableContainer input[type="search"] {
+    outline: 1px solid rgba(185, 185, 185, 0.459);
+}
+.dark .theTableContainer input,
+.dark .theTableContainer select {
+    color: inherit;
+    background-color: #333333;
+}
+.dark .columsToggle label span {
+    background-color: rgb(53, 53, 53);
+}
+.dark .theTableContainer input:checked ~ span {
+    background-color: #000000;
+}
+.dark button {
+    background-color: #333333;
+    color: inherit;
+}

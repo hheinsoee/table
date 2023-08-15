@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Data Table</title>
+    <script src="./public/assets/dataTable/script.js"></script>
+    <script src="./public/assets/jquery/jquery-3.6.1.min.js"></script>
+    <link rel="stylesheet" href="./public/assets/dataTable/style.css">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        body.dark {
+            background-color: #111;
+            color: #aaa;
+        }
+    </style>
+</head>
+
+<body class="dark">
+    <span onclick='$("body").toggleClass("dark");'>Change dark or light</span>
+
+    <div id="abc"></div>
+    <script>
+        var userList = [
+            { id: 1, name: "Kyaw Soe", age: 19, height: '30cm', girl: true },
+            { id: 2, image: 'https://avatars.githubusercontent.com/u/35089574?v=4', name: "Hein Soe", age: 29 },
+            { id: 3, name: "Japan Gree", age: 19 },
+            { id: 4, name: "Moe Kyaw Soe", age: 24, weight: "40kg" },
+            { id: 5, name: "Kyaw Soe", age: 19, height: '30cm' },
+            { id: 6, name: "Hein Soe", age: 29 },
+            { id: 7, name: "Japan Gree", age: 19, girl: true },
+            { id: 8, name: "Moe Kyaw Soe", age: 24, weight: "40kg" },
+            { id: 9, name: "Kyaw Soe", age: 19, height: '30cm' },
+            { id: 10, name: "Hein Soe", age: 29 },
+            { id: 11, name: "Japan Gree", age: 19 },
+            { id: 12, name: "Moe Kyaw Soe", age: 24, weight: "40kg" },
+            { id: 13, name: "Kyaw Soe", age: 19, height: '30cm' },
+            { id: 14, name: "Hein Soe", age: 29 },
+            { id: 15, name: "Japan Gree", age: 19 },
+            { id: 16, name: "Moe Kyaw Soe", age: 24, weight: "40kg" },
+            { id: 17, name: "Kyaw Soe", age: 19, height: '30cm' },
+            { id: 18, name: "Hein Soe", age: 29 },
+            { id: 19, name: "Japan Gree", age: 19 },
+            { id: 20, name: "Moe Kyaw Soe", age: 24, weight: "40kg" },
+            { id: 21, name: "Kyaw Soe", age: 19, height: '30cm' },
+            { id: 22, name: "Hein Soe", age: 29 },
+            { id: 23, name: "Japan Gree", age: 19 },
+            { id: 24, name: "Moe Kyaw Soe", age: 24, weight: "40kg" },
+        ];
+
+        TheTable(
+            {
+                element: '#abc',
+                name: "user table",
+                cols: [
+                    { key: 'id', label: 'ID' },
+                    { key: 'girl', label: 'စော်ရျိမရှိ', render: (a) => a.girl ? "ရှိပါရေ" : "မရှိပါ" },
+                    { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "" },
+                    { key: 'name', label: 'Family Name', render: (data) => `${data.name}` },
+                    { key: 'age', label: 'Age', render: (data) => `${data.age} year`, className: "red", css: "color:#0099ff" },
+                    { key: 'function', label: 'function', render: (data) => `${data.age > 20 ? '<span style="color:red">Old</span>' : '<span style="color:green">Young</span>'}`, },
+                    { key: 'action', label: '', render: (data) => `<span onclick='alert("${data.age > 20 ? 'U ' : 'Mg '} ${data.name} is ${data.age} years old.")'>click</span>` }
+                ],
+                sort: ['name', true]
+            }
+        )
+        setTimeout(() => {
+            TheTable(
+                {
+                    element: '#abc',
+                    data: userList,
+                    name: "user table",
+                    cols: [
+                        { key: 'id', label: 'ID', css: 'text-align:right', sort:false },
+                        { key: 'girl', label: 'စော်ရှိမရှိ', render: (a) => a.girl ? "ရှိပါရေ" : "<span style='color:#a44'>မရှိပါ</span>" },
+                        { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "" },
+                        { key: 'name', label: 'Family Name', render: (data) => `${data.name}` },
+                        { key: 'age', label: 'Age', render: (data) => `${data.age} year`, className: "red", css: "color:#0099ff" },
+                        { key: 'function', label: 'function', render: (data) => `${data.age > 20 ? '<span style="color:red">Old</span>' : '<span style="color:green">Young</span>'}`, },
+                        { key: 'action', label: '', render: (data) => `<span onclick='alert("${data.age > 20 ? 'U ' : 'Mg '} ${data.name} is ${data.age} years old.")'>click</span>` }
+                    ],
+                    sort: ['name', true]
+                }
+            )
+        }, 1000)
+
+
+    </script>
+</body>
+
+</html>
