@@ -29,7 +29,10 @@ const TheTable = (props) => {
     colSetting
       ? cols.push({
           ...colSetting,
-          sort: colSetting.sort == undefined || colSetting.sort == null || colSetting.sort
+          sort:
+            colSetting.sort == undefined ||
+            colSetting.sort == null ||
+            colSetting.sort,
         })
       : cols.push({
           key: key,
@@ -86,7 +89,7 @@ const TheTable = (props) => {
 
   //colum toggle start
   cols.forEach((c, i) => {
-    const $checkBox = $("<label>").html(
+    const $checkBox = $(`<label title="${c.label || c.key}">`).html(
       `<input type="checkbox" ${
         (!defaultHide || !defaultHide.includes(c.key)) && "checked"
       }/><span>${c.label || c.key}</span>`
@@ -137,8 +140,11 @@ const TheTable = (props) => {
     cols.forEach((col) => {
       console.log();
       if (!defaultHide || !defaultHide.includes(col.key)) {
-        const $th = $(`<th ${col.css ? `style=${col.css}` : ""}>`).html(
-          `${col.label ? col.label : col.key} 
+        var label = col.label ? col.label : col.key;
+        const $th = $(
+          `<th ${col.css ? `style=${col.css}` : ""} title="${label}">`
+        ).html(
+          ` ${label}
           ${sort.key == col.key ? (sort?.asc ? "&#8964" : "&#8963") : ""}`
         );
         // Attach sorting event listener
@@ -170,11 +176,12 @@ const TheTable = (props) => {
           const $tbodyRow = $("<tr>");
           cols.forEach((col) => {
             if (!defaultHide || !defaultHide.includes(col.key)) {
+              var cell = col.render ? col.render(row) : row[col.key];
               const $td = $(
-                `<td 
-              ${col.className ? `class=${col.className}` : ""} 
+                `<td ${row[col.key]?`title='${row[col.key]}'`:""}
+              ${col.className ? `class="${col.className}"` : ""} 
               ${col.css ? `style="${col.css}"` : ""}>`
-              ).html(col.render ? col.render(row) : row[col.key]);
+              ).html(cell);
               $tbodyRow.append($td);
             }
           });

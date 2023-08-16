@@ -51,6 +51,7 @@
                                 element: '#simple',
                                 data: userList,
                                 name: "simple",
+                                cols: [{ key: 'id', label: 'ID', css: 'text-align:right;width:20px' }]
                             }
                         )
                     </script>
@@ -70,6 +71,7 @@
                                 element: '#darkTable',
                                 data: userList,
                                 name: "simple",
+                                cols: [{ key: 'id', label: 'ID', css: 'text-align:right;width:20px' }]
                             }
                         )
                     </script>
@@ -105,7 +107,7 @@
                                 data: userList,
                                 name: "user table",
                                 cols: [
-                                    { key: 'id', label: 'ID' },
+                                    { key: 'id', label: 'ID', css: 'text-align:right;width:20px' },
                                     { key: 'girl', label: 'စော်ရှိမရှိ', render: (a) => a.girl ? "ရှိပါရေ" : "<span style='color:#a44'>မရှိပါ</span>" },
                                     { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "" },
                                     { key: 'name', label: 'Full Name', render: (data) => `${data.name}` },
@@ -127,7 +129,7 @@
                                 data: userList,
                                 name: "user table",
                                 cols: [
-                                    { key: 'id', label: 'ID', css: 'text-align:right' },
+                                    { key: 'id', label: 'ID', css: 'text-align:right;width:20px' },
                                     { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "" },
                                     { key: 'name', label: 'Full Name', render: (data) => `${data.name}` },
                                     { key: 'age', label: 'Age', render: (data) => `${data.age} year`, className: "border", css: "color:#0099ff" }
@@ -142,19 +144,13 @@
                     <h2>{defaultHide}</h2>
                     <div id="defaultHide"></div>
                     <script>
-                        var userList = [
-                            { id: 1, name: "Kyaw Soe", age: 19, girl: true },
-                            { id: 2, image: 'https://avatars.githubusercontent.com/u/35089574?v=4', name: "Hein Soe", age: 29 },
-                            { id: 3, name: "Japan Gree", age: 19 },
-                            { id: 4, name: "Moe Kyaw Soe", age: 24, weight: "40kg" },
-                        ];
                         TheTable(
                             {
                                 element: '#defaultHide',
                                 data: userList,
                                 name: "user table",
                                 cols: [
-                                    { key: 'id', label: 'ID', css: 'text-align:right', sort: false },
+                                    { key: 'id', label: 'ID', css: 'text-align:right;width:20px' },
                                     { key: 'girl', label: 'စော်ရှိမရှိ', render: (a) => a.girl ? "ရှိပါရေ" : "<span style='color:#a44'>မရှိပါ</span>" },
                                     { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "" },
                                     { key: 'name', label: 'Full Name', render: (data) => `${data.name}` },
@@ -178,7 +174,7 @@
                                 data: userList,
                                 name: "user table",
                                 cols: [
-                                    { key: 'id', label: 'ID', css: 'text-align:right', sort: false },
+                                    { key: 'id', label: 'ID', css: 'text-align:right;width:20px' },
                                     { key: 'girl', label: 'စော်ရှိမရှိ', render: (a) => a.girl ? "ရှိပါရေ" : "<span style='color:#a44'>မရှိပါ</span>" },
                                     { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "" },
                                     { key: 'name', label: 'Full Name', render: (data) => `${data.name}` },
@@ -191,7 +187,7 @@
                         )
                     </script>
                 </section>
-                
+
                 <section id="extraCols_">
                     <h2>Extra Colums / action</h2>
                     <div id="extraCols"></div>
@@ -202,7 +198,7 @@
                                 data: userList,
                                 name: "user table",
                                 cols: [
-                                    { key: 'id', label: 'ID', css: 'text-align:right', sort: false },
+                                    { key: 'id', label: 'ID', css: 'text-align:right;width:20px' },
                                     { key: 'girl', label: 'စော်ရှိမရှိ', render: (a) => a.girl ? "ရှိပါရေ" : "<span style='color:#a44'>မရှိပါ</span>" },
                                     { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "" },
                                     { key: 'name', label: 'Full Name', render: (data) => `${data.name}` },

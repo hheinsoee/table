@@ -49,7 +49,7 @@
                 element: '#mytable',
                 name: "Man U Player",
                 cols: [
-                    { key: 'no', label: 'No.', css: "font-size:12pt;font-weight:800; text-align:right;width:40px;" },
+                    { key: 'no', label: 'No', css: 'font-size:12pt;font-weight:800;text-align:right;width:2rem' },
                     { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "", css: 'width:40px;', sort: false },
                     { key: 'name', label: 'Name' },
                     { key: 'age', label: 'Age', render: (d) => `${d.age} yr` },
