@@ -5,8 +5,9 @@
 // This script provides functionality for a data table.
 //
 // Author: Hein Soe
-// GitHub: https://github.com/hheinsoee
+// GitHub: https://github.com/hheinsoee/table
 // Date: 2023-08-15
+// Version: 1.0.1
 //
 // ===============================================
 
