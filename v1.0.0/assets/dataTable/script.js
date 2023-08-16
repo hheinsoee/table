@@ -29,7 +29,7 @@ const TheTable = (props) => {
     colSetting
       ? cols.push({
           ...colSetting,
-          sort: false,
+          sort: colSetting.sort == undefined || colSetting.sort == null || colSetting.sort
         })
       : cols.push({
           key: key,
@@ -138,15 +138,12 @@ const TheTable = (props) => {
       console.log();
       if (!defaultHide || !defaultHide.includes(col.key)) {
         const $th = $(`<th ${col.css ? `style=${col.css}` : ""}>`).html(
-          `${col.label ? col.label : col.key} ${
-            sort.key == col.key ? (sort.asc ? "&#8964" : "&#8963") : ""
-          }`
+          `${col.label ? col.label : col.key} 
+          ${sort.key == col.key ? (sort?.asc ? "&#8964" : "&#8963") : ""}`
         );
         // Attach sorting event listener
-        if (col.sort == undefined && col.sort == null) {
+        if (col.sort) {
           $th.on("click", () => mySort(col.key, !sort.asc));
-        } else {
-          col.sort && $th.on("click", () => mySort(col.key, !sort.asc));
         }
         $theadRow.append($th);
       }

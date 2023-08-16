@@ -8,7 +8,7 @@
     <script src="./assets/dataTable/script.js"></script>
     <script src="./assets/jquery/jquery-3.6.1.min.js"></script>
     <link rel="stylesheet" href="./assets/dataTable/style.css">
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./../style.css">
     <style>
         body {
             margin: 0;
@@ -168,6 +168,30 @@
                     </script>
                 </section>
 
+                <section id="sort_">
+                    <h2>{sort}</h2>
+                    <div id="sort"></div>
+                    <script>
+                        TheTable(
+                            {
+                                element: '#sort',
+                                data: userList,
+                                name: "user table",
+                                cols: [
+                                    { key: 'id', label: 'ID', css: 'text-align:right', sort: false },
+                                    { key: 'girl', label: 'စော်ရှိမရှိ', render: (a) => a.girl ? "ရှိပါရေ" : "<span style='color:#a44'>မရှိပါ</span>" },
+                                    { key: 'image', label: "photo", render: (data) => data.image ? `<img src="${data.image}" class="avatar">` : "" },
+                                    { key: 'name', label: 'Full Name', render: (data) => `${data.name}` },
+                                    { key: 'age', label: 'Age', render: (data) => `${data.age} year`, className: "red", css: "color:#0099ff" },
+                                    { key: 'function', label: 'function', render: (data) => `${data.age > 20 ? '<span style="color:red">Old</span>' : '<span style="color:green">Young</span>'}`, },
+                                    { key: 'action', label: '', render: (data) => `<span onclick='alert("${data.age > 20 ? 'U ' : 'Mg '} ${data.name} is ${data.age} years old.")'>click</span>` }
+                                ],
+                                defaultHide: ['age']
+                            }
+                        )
+                    </script>
+                </section>
+                
                 <section id="extraCols_">
                     <h2>Extra Colums / action</h2>
                     <div id="extraCols"></div>
