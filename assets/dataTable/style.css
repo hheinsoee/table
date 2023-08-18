@@ -7,7 +7,7 @@
    Author: Hein Soe
    GitHub: https://github.com/hheinsoee/table
    Date: 2023-08-15
-   Version : 1.0.1
+   Version : 2.0.0
    =============================================== */
 
 .tableContainer {
@@ -20,7 +20,6 @@
     box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
     width: 100%;
     max-width: 100%;
-    border-radius: 0.3rem;
     font-size: 11pt;
     table-layout: fixed;
 }
@@ -67,6 +66,7 @@
     align-items: center;
     border-radius: 0.3rem;
     overflow: hidden;
+    flex-wrap: wrap;
 }
 #loading > * {
     animation: spain 2s infinite;
@@ -82,7 +82,7 @@
 .columsToggle label:first-child {
     border: none;
 }
-form.search{
+form.search {
     border-radius: 0.3rem;
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -95,7 +95,7 @@ input[type="search"] {
     color: inherit;
 }
 
-input[type="search"]~button{
+input[type="search"] ~ button {
     border: none;
     cursor: pointer;
 }
@@ -128,9 +128,11 @@ input[type="search"]:focus-visible {
     z-index: 10;
     padding: 5px 10px;
     backdrop-filter: blur(10px);
+    gap:1rem;
 }
 .topPanel {
     top: 0;
+    align-items: flex-end;
 }
 .bottomPanel {
     bottom: 0;
@@ -154,7 +156,8 @@ input[type="search"]:focus-visible {
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    border-left: 1pt solid #99999981;
+    margin:0px 0.5px;
+    /* border: 0.5pt solid #99999981; */
 }
 .columsToggle label span {
     background-color: #eeeeee;
@@ -219,4 +222,8 @@ input[type="search"]:focus-visible {
 .dark button {
     background-color: #333333;
     color: inherit;
+}
+.columsToggle,
+.paganition {
+    outline: 1px solid rgba(50%, 50%, 50%, 50%);
 }

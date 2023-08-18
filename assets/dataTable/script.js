@@ -7,14 +7,14 @@
 // Author: Hein Soe
 // GitHub: https://github.com/hheinsoee/table
 // Date: 2023-08-15
-// Version: 1.0.1
+// Version: 2.0.0
 //
 // ===============================================
 // Define the TheTable component
 const TheTable = (props) => {
   var filter = {};
   var currentData = [];
-  let sort = {
+  var sort = {
     key: null,
     asc: false,
   };
@@ -119,12 +119,17 @@ const TheTable = (props) => {
     // thead ထည့်ရန်
     const $theadRow = $("<tr>");
     cols.forEach((col) => {
+      // console.log(sort.key,col.key)
       if (!defaultHide || !defaultHide.includes(col.key)) {
         var label = col.label ? col.label : col.key;
         const css = col.css ? `style='${col.css}'` : "";
-        const $th = $(`<th ${css} title="${label}">`).html(` ${label}`);
+        const $th = $(`<th ${css} title="${label}">`).html(
+          ` ${label} ${
+            sort.key == col.key ? (sort?.asc ? "&#8964" : "&#8963") : ""
+          }`
+        );
         // Attach sorting event listener
-        if (col.sort) {
+        if (col.sort && data) {
           $th.on("click", () => sortFromServer(col.key, !sort.asc));
         }
         $theadRow.append($th);
@@ -162,7 +167,8 @@ const TheTable = (props) => {
         $tbody.append($tbodyRow);
       }
     }
-    $table.append($thead, $tbody);
+    const $caption = props.caption ? `<caption>${props.caption}</caption>` : "";
+    $table.append($caption, $thead, $tbody);
 
     ////////////
     ///Bottom///
@@ -215,7 +221,7 @@ const TheTable = (props) => {
     $(props.element).empty();
     $(props.element).addClass("theTableContainer");
     $(props.element).append($topPanel, $table, $bottomPanel);
-    console.log(currentData);
+    // console.log(currentData);
   }
 
   ////////////////////////////
@@ -233,6 +239,11 @@ const TheTable = (props) => {
   };
 
   const sortFromServer = (key, asc) => {
+    currentPig = 0
+    sort = {
+      key: key,
+      asc: asc,
+    };
     loadingTable();
     load(
       {
@@ -242,12 +253,13 @@ const TheTable = (props) => {
       (err, data) => {
         if (!err) {
           currentData = [...data];
+          renderTable(currentData);
         }
-        renderTable(currentData);
       }
     );
   };
   const searchFromServer = (words) => {
+    currentPig = 0
     filter = {
       search: words,
     };
