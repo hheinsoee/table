@@ -11,74 +11,30 @@
 //
 // ===============================================
 // Define the TheTable component
-class TheTable {
-  constructor(props) {
-    this.filter = {};
-    this.currentData = [];
-    this.sort = {
-      key: null,
-      asc: false,
-    };
-    this.page = 1;
-    this.currentPig = 0;
-    this.pagLimit = 10;
-    this.props = props;
+const TheTable = (props) => {
+  var filter = {};
+  var currentData = [];
+  var sort = {
+    key: null,
+    asc: false,
+  };
+  let page = 1;
+  let currentPig = 0;
+  let pagLimit = 10;
 
-    this.init();
-  }
-
-  load(query, cb) {
+  function load(query, cb) {
     $("#loading").css("display", "inherit");
-    var jqxhr = $.get(this.props.api, query);
+    var jqxhr = $.get(props.api, query);
 
     jqxhr.done(function (r) {
       cb(null, r);
     });
   }
-
-  clear() {
-    this.currentData = [];
+  function clear() {
+    currentData = [];
   }
-  sortFromServer(key, asc) {
-    this.currentPig = 0;
-    this.sort = {
-      key: key,
-      asc: asc,
-    };
-    this.loadingTable();
-    this.load(
-      {
-        sortby: key,
-        asc: asc,
-      },
-      (err, data) => {
-        if (!err) {
-          this.currentData = [...data];
-          this.renderTable(this.currentData);
-        }
-      }
-    );
-  }
-
-  loadingTable() {
-    this.executeFunction = false;
-    this.page = 1;
-    function changeWidth() {
-      var skeleton = $(".skeleton");
-      skeleton.each(function () {
-        var randomWidth = Math.floor(Math.random() * (100 - 50 + 1)) + 20;
-
-        // Set the random values
-        $(this).css({
-          width: randomWidth + "%",
-        });
-      });
-    }
-    this.renderTable(false), changeWidth(), setInterval(changeWidth, 1000);
-  }
-
-  renderTable(data) {
-    var defaultHide = this.props.defaultHide || [];
+  function renderTable(data) {
+    var defaultHide = props.defaultHide || [];
     var cols = [];
     var rows = $.isArray(data) ? data : [];
 
@@ -86,15 +42,14 @@ class TheTable {
       return keys.concat(Object.keys(obj));
     }, []);
 
-    const startIndex = this.currentPig * this.pagLimit;
-    const endIndex = Math.min(startIndex + this.pagLimit, rows.length);
+    const startIndex = currentPig * pagLimit;
+    const endIndex = Math.min(startIndex + pagLimit, rows.length);
 
     // Remove duplicates
     const uniqueKeys = [...new Set(allKeys)];
 
     uniqueKeys.forEach((key) => {
-      var colSetting =
-        this.props.cols && this.props.cols.find((col) => col.key == key);
+      var colSetting = props.cols && props.cols.find((col) => col.key == key);
       colSetting
         ? cols.push({
             ...colSetting,
@@ -107,7 +62,7 @@ class TheTable {
             key: key,
           });
     });
-    this.props.cols?.forEach((col) => {
+    props.cols?.forEach((col) => {
       if (!uniqueKeys.includes(col.key)) {
         cols.push(col);
       }
@@ -136,31 +91,21 @@ class TheTable {
         } else {
           defaultHide.push(col.key);
         }
-        this.renderTable(data);
+        renderTable(data);
       });
 
       $columsToggle.append($checkBox);
     });
 
-    const $searchform = $(
+    $searchform = $(
       `<form class="search"><input type="search" placeholder="Search..." value="${
-        this.filter.search || ""
+        filter.search || ""
       }"><button>&#128269;</button></form>`
     );
-    $searchform.on("submit", (event) => {
+    $searchform.on("submit", function (event) {
       event.preventDefault(); // Prevent the default form submission
       const inputValue = $searchform.find("input").val();
-      this.currentPig = 0;
-      this.filter = {
-        search: inputValue,
-      };
-      this.loadingTable();
-      this.load(this.filter, (err, data) => {
-        if (!err) {
-          this.currentData = [...data];
-        }
-        this.renderTable(this.currentData);
-      });
+      searchFromServer(inputValue);
     });
     $topPanel.append($columsToggle, $searchform);
 
@@ -179,16 +124,12 @@ class TheTable {
         const css = col.css ? `style='${col.css}'` : "";
         const $th = $(`<th ${css} title="${label}">`).html(
           ` ${label} ${
-            this.sort.key == col.key
-              ? this.sort?.asc
-                ? "&#8964"
-                : "&#8963"
-              : ""
+            sort.key == col.key ? (sort?.asc ? "&#8964" : "&#8963") : ""
           }`
         );
         // Attach sorting event listener
         if (col.sort && data) {
-          $th.on("click", () => this.sortFromServer(col.key, !this.sort.asc));
+          $th.on("click", () => sortFromServer(col.key, !sort.asc));
         }
         $theadRow.append($th);
       }
@@ -211,7 +152,7 @@ class TheTable {
         $tbody.append($tbodyRow);
       }
     } else {
-      for (let i = 0; i < this.pagLimit; i++) {
+      for (let i = 0; i < pagLimit; i++) {
         const $tbodyRow = $("<tr></tr>");
         cols.forEach((col) => {
           if (!defaultHide.includes(col.key)) {
@@ -225,9 +166,7 @@ class TheTable {
         $tbody.append($tbodyRow);
       }
     }
-    const $caption = this.props.caption
-      ? `<caption>${this.props.caption}</caption>`
-      : "";
+    const $caption = props.caption ? `<caption>${props.caption}</caption>` : "";
     $table.append($caption, $thead, $tbody);
 
     ////////////
@@ -242,15 +181,13 @@ class TheTable {
     const $select = $("<select>");
     [10, 20, 50, 100].forEach((c) => {
       $select.append(
-        `<option value="${c}" ${
-          c == this.pagLimit ? "selected" : ""
-        }>${c}</option>`
+        `<option value="${c}" ${c == pagLimit ? "selected" : ""}>${c}</option>`
       );
     });
     $select.on("change", (e) => {
-      this.currentPig = 0;
-      this.pagLimit = e.target.value;
-      this.renderTable(this.currentData);
+      currentPig = 0;
+      pagLimit = e.target.value;
+      renderTable(currentData);
     });
 
     $rowMonitor.html(
@@ -260,13 +197,13 @@ class TheTable {
     );
 
     $paganition.empty();
-    for (let i = 0; i <= Math.floor(rows.length / this.pagLimit); i++) {
+    for (let i = 0; i <= Math.floor(rows.length / pagLimit); i++) {
       const $pigBtn = $(
-        `<li class="${this.currentPig == i && "active"}">${i + 1}</li>`
+        `<li class="${currentPig == i && "active"}">${i + 1}</li>`
       );
       $pigBtn.on("click", () => {
-        this.currentPig = i;
-        this.renderTable(this.currentData);
+        currentPig = i;
+        renderTable(currentData);
       });
       $paganition.append($pigBtn);
     }
@@ -275,32 +212,87 @@ class TheTable {
       "<li id='loading' style='display:none'><span>|</span></li>"
     );
     const $btn = $("<li>...More</li>");
-    $btn.on("click", () => {
-      this.load({ page: this.page + 1 }, (err, data) => {
-        if (!err) {
-          this.currentData = [...this.currentData, ...data];
-        }
-        this.page = this.page + 1;
-        this.renderTable(this.currentData);
-      });
-    });
+    $btn.on("click", () => loadMore());
     $paganition.append($loader, $btn);
     $rowsperpage.append($select, $rowMonitor);
     $bottomPanel.append($rowsperpage, $paganition);
 
-    $(this.props.element).empty();
-    $(this.props.element).addClass("theTableContainer");
-    $(this.props.element).append($topPanel, $table, $bottomPanel);
+    $(props.element).empty();
+    $(props.element).addClass("theTableContainer");
+    $(props.element).append($topPanel, $table, $bottomPanel);
     // console.log(currentData);
   }
 
-  init() {
-    this.loadingTable();
-    this.load({}, (err, data) => {
+  ////////////////////////////
+  /////////////////////////////
+  ////////////////////////////
+
+  const loadMore = () => {
+    load({ page: page + 1 }, (err, data) => {
       if (!err) {
-        this.currentData = [...this.currentData, ...data];
+        currentData = [...currentData, ...data];
       }
-      this.renderTable(this.currentData);
+      page = page + 1;
+      renderTable(currentData);
     });
-  }
-}
+  };
+
+  const sortFromServer = (key, asc) => {
+    currentPig = 0
+    sort = {
+      key: key,
+      asc: asc,
+    };
+    loadingTable();
+    load(
+      {
+        sortby: key,
+        asc: asc,
+      },
+      (err, data) => {
+        if (!err) {
+          currentData = [...data];
+          renderTable(currentData);
+        }
+      }
+    );
+  };
+  const searchFromServer = (words) => {
+    currentPig = 0
+    filter = {
+      search: words,
+    };
+    loadingTable();
+    load(filter, (err, data) => {
+      if (!err) {
+        currentData = [...data];
+      }
+      renderTable(currentData);
+    });
+  };
+  // initial
+  
+  const loadingTable = () => {
+    page = 1;
+    function changeWidth() {
+      var skeleton = $(".skeleton");
+      skeleton.each(function () {
+        var randomWidth = Math.floor(Math.random() * (100 - 50 + 1)) + 20;
+
+        // Set the random values
+        $(this).css({
+          width: randomWidth + "%",
+        });
+      });
+    }
+    renderTable(false), changeWidth(), setInterval(changeWidth, 1000);
+  };
+
+  loadingTable();
+  load({}, (err, data) => {
+    if (!err) {
+      currentData = [...currentData, ...data];
+    }
+    renderTable(currentData);
+  });
+};
