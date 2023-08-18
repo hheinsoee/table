@@ -18,6 +18,7 @@ const TheTable = (props) => {
     key: null,
     asc: false,
   };
+  let page = 1;
   let currentPig = 0;
   let pagLimit = 10;
 
@@ -222,10 +223,11 @@ const TheTable = (props) => {
   ////////////////////////////
 
   const loadMore = () => {
-    load("query", (err, data) => {
+    load({ page: page + 1 }, (err, data) => {
       if (!err) {
         currentData = [...currentData, ...data];
       }
+      page = page + 1;
       renderTable(currentData);
     });
   };
@@ -260,6 +262,7 @@ const TheTable = (props) => {
   // initial
 
   const loadingTable = () => {
+    page = 1;
     function changeWidth() {
       var skeleton = $(".skeleton");
       skeleton.each(function () {
