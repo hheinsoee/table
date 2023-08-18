@@ -12,6 +12,7 @@
 // ===============================================
 // Define the TheTable component
 const TheTable = (props) => {
+  var filter = {};
   var currentData = [];
   let sort = {
     key: null,
@@ -22,7 +23,8 @@ const TheTable = (props) => {
 
   function load(query, cb) {
     $("#loading").css("display", "inherit");
-    var jqxhr = $.get(props.api);
+    var jqxhr = $.get(props.api, query);
+
     jqxhr.done(function (r) {
       cb(null, r);
     });
@@ -96,8 +98,15 @@ const TheTable = (props) => {
     });
 
     $searchform = $(
-      `<form><input type="search" placeholder="Search..."></form>`
+      `<form class="search"><input type="search" placeholder="Search..." value="${
+        filter.search || ""
+      }"><button>&#128269;</button></form>`
     );
+    $searchform.on("submit", function (event) {
+      event.preventDefault(); // Prevent the default form submission
+      const inputValue = $searchform.find("input").val();
+      searchFromServer(inputValue);
+    });
     $topPanel.append($columsToggle, $searchform);
 
     ///////////
@@ -115,7 +124,7 @@ const TheTable = (props) => {
         const $th = $(`<th ${css} title="${label}">`).html(` ${label}`);
         // Attach sorting event listener
         if (col.sort) {
-          $th.on("click", () => console.log(col.key, !sort.asc));
+          $th.on("click", () => sortFromServer(col.key, !sort.asc));
         }
         $theadRow.append($th);
       }
@@ -221,23 +230,52 @@ const TheTable = (props) => {
     });
   };
 
+  const sortFromServer = (key, asc) => {
+    loadingTable();
+    load(
+      {
+        sortby: key,
+        asc: asc,
+      },
+      (err, data) => {
+        if (!err) {
+          currentData = [...data];
+        }
+        renderTable(currentData);
+      }
+    );
+  };
+  const searchFromServer = (words) => {
+    filter = {
+      search: words,
+    };
+    loadingTable();
+    load(filter, (err, data) => {
+      if (!err) {
+        currentData = [...data];
+      }
+      renderTable(currentData);
+    });
+  };
   // initial
 
-  renderTable(false);
-  var skeleton = $(".skeleton");
-  function changeWidth() {
-    skeleton.each(function () {
-      var randomWidth = Math.floor(Math.random() * (100 - 50 + 1)) + 20;
+  const loadingTable = () => {
+    function changeWidth() {
+      var skeleton = $(".skeleton");
+      skeleton.each(function () {
+        var randomWidth = Math.floor(Math.random() * (100 - 50 + 1)) + 20;
 
-      // Set the random values
-      $(this).css({
-        width: randomWidth + "%",
+        // Set the random values
+        $(this).css({
+          width: randomWidth + "%",
+        });
       });
-    });
-  }
-  changeWidth();
-  setInterval(changeWidth, 1000);
-  load("query", (err, data) => {
+    }
+    renderTable(false), changeWidth(), setInterval(changeWidth, 1000);
+  };
+
+  loadingTable();
+  load({}, (err, data) => {
     if (!err) {
       currentData = [...currentData, ...data];
     }

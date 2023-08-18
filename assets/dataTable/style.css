@@ -82,14 +82,22 @@
 .columsToggle label:first-child {
     border: none;
 }
-input[type="search"] {
-    border: none;
+form.search{
     border-radius: 0.3rem;
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+}
+input[type="search"] {
+    border: none;
     padding: 3px 8px;
     outline: none;
     background-color: transparent;
     color: inherit;
+}
+
+input[type="search"]~button{
+    border: none;
+    cursor: pointer;
 }
 input[type="search"]:focus-visible {
     box-shadow: 0px 8px 17px rgba(0, 0, 0, 0.2);
@@ -194,7 +202,7 @@ input[type="search"]:focus-visible {
     color: #dedede;
 }
 
-.dark .theTableContainer input[type="search"] {
+.dark .theTableContainer form.search {
     outline: 1px solid rgba(185, 185, 185, 0.459);
 }
 .dark .theTableContainer input,
