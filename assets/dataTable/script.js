@@ -10,121 +10,170 @@
 // Version: 1.0.1
 //
 // ===============================================
-
+// Define the TheTable component
 const TheTable = (props) => {
-  var defaultHide = props.defaultHide || [];
-  var cols = [];
-  var loading = !$.isArray(props.data);
-  var rows = $.isArray(props.data) ? props.data : [];
-  var pagLimit = 10;
+  var currentData = [];
+  let sort = {
+    key: null,
+    asc: false,
+  };
+  let currentPig = 0;
+  let pagLimit = 10;
 
-  const allKeys = rows.reduce((keys, obj) => {
-    return keys.concat(Object.keys(obj));
-  }, []);
-  var currentPig = 0;
-  // Remove duplicates
-  const uniqueKeys = [...new Set(allKeys)];
+  function load(query, cb) {
+    $("#loading").css("display", "inherit");
+    var jqxhr = $.get(props.api);
+    jqxhr.done(function (r) {
+      cb(null, r);
+    });
+  }
+  function clear() {
+    currentData = [];
+  }
+  function renderTable(data) {
+    var defaultHide = props.defaultHide || [];
+    var cols = [];
+    var loading = !$.isArray(data);
+    var rows = $.isArray(data) ? data : [];
 
-  uniqueKeys.forEach((key) => {
-    var colSetting = props.cols && props.cols.find((col) => col.key == key);
-    colSetting
-      ? cols.push({
-          ...colSetting,
-          sort:
-            colSetting.sort == undefined ||
-            colSetting.sort == null ||
-            colSetting.sort,
-        })
-      : cols.push({
-          key: key,
-        });
-  });
-  props.cols?.forEach((col) => {
-    if (!uniqueKeys.includes(col.key)) {
-      cols.push(col);
-    }
-  });
+    const allKeys = rows.reduce((keys, obj) => {
+      return keys.concat(Object.keys(obj));
+    }, []);
 
-  const $topPanel = $("<div>").addClass("topPanel");
-  const $tableContainer = $("<div>").addClass("tableContainer");
-  const $bottomPanel = $("<div>").addClass("bottomPanel");
+    const startIndex = currentPig * pagLimit;
+    const endIndex = Math.min(startIndex + pagLimit, rows.length);
 
-  const $searchForm = $("<form>");
-  const $columsToggle = $("<div>").addClass("columsToggle");
+    // Remove duplicates
+    const uniqueKeys = [...new Set(allKeys)];
 
-  const $rowsperpage = $("<div>").addClass("rowsperpage");
-  const $rowMonitor = $("<div>");
-  const $paganition = $("<ul>").addClass("paganition");
+    uniqueKeys.forEach((key) => {
+      var colSetting = props.cols && props.cols.find((col) => col.key == key);
+      colSetting
+        ? cols.push({
+            ...colSetting,
+            sort:
+              colSetting.sort == undefined ||
+              colSetting.sort == null ||
+              colSetting.sort,
+          })
+        : cols.push({
+            key: key,
+          });
+    });
+    props.cols?.forEach((col) => {
+      if (!uniqueKeys.includes(col.key)) {
+        cols.push(col);
+      }
+    });
 
-  const $select = $("<select>");
-  [10, 20, 50, 100].forEach((c) => {
-    $select.append(`<option value="${c}">${c}</option>`);
-  });
-  $select.on("change", (e) => {
-    currentPig = 0;
-    pagLimit = e.target.value;
-    renderTable();
-  });
-  $rowsperpage.append($select);
-  $rowsperpage.append($rowMonitor);
+    //////////
+    ///TOP////
+    //////////
+    const $topPanel = $(`<div class="topPanel"></div>`);
+    const $columsToggle = $(`<div class="columsToggle"></div>`);
+    //toggle ထည်ရန်
+    cols.forEach((col) => {
+      const $checkBox = $(`
+        <label title="${col.label || col.key}">
+          <input type="checkbox" ${
+            !defaultHide.includes(col.key) ? "checked" : ""
+          } />
+          <span>${col.label || col.key}</span>
+        </label>
+      `);
 
-  $bottomPanel.append($rowsperpage);
-  $bottomPanel.append($paganition);
-
-  $topPanel.append($columsToggle);
-  $topPanel.append($searchForm);
-  $(props.element).empty();
-  $(props.element).addClass("theTableContainer");
-  $(props.element).append($topPanel, $tableContainer, $bottomPanel);
-
-  //search form start
-  const $searchInput = $("<input>").attr({
-    type: "search",
-    placeholder: "Search...",
-  });
-  $searchInput.on("input", (event) => {
-    mySearch(event.target.value);
-  });
-  $searchForm.append($searchInput);
-  //search form end
-
-  //colum toggle start
-  cols.forEach((c, i) => {
-    const $checkBox = $(`<label title="${c.label || c.key}">`).html(
-      `<input type="checkbox" ${
-        (!defaultHide || !defaultHide.includes(c.key)) && "checked"
-      }/><span>${c.label || c.key}</span>`
-    );
-    $checkBox.addClass("noselect");
-    $checkBox.on(
-      "change",
-      () => (
-        defaultHide.includes(c.key)
-          ? defaultHide.splice($.inArray(c.key, defaultHide), 1)
-          : defaultHide.push(c.key),
-        renderTable()
-      )
-    );
-    $columsToggle.append($checkBox);
-  });
-  //colum toggl eend
-
-  //table
-  const renderTable = () => {
-    $paganition.empty();
-    for (let i = 0; i <= Math.floor(rows.length / pagLimit); i++) {
-      const $pigBtn = $(
-        `<li class="${currentPig == i && "active"}">${i + 1}</li>`
-      );
-      $pigBtn.on("click", () => {
-        currentPig = i;
-        renderTable();
+      $checkBox.addClass("noselect");
+      $checkBox.on("change", () => {
+        if (defaultHide.includes(col.key)) {
+          defaultHide.splice(defaultHide.indexOf(col.key), 1);
+        } else {
+          defaultHide.push(col.key);
+        }
+        renderTable(data);
       });
-      $paganition.append($pigBtn);
-    }
 
-    var startIndex = pagLimit * currentPig;
-    var endIndex = startIndex * 1 + pagLimit * 1;
+      $columsToggle.append($checkBox);
+    });
+
+    $searchform = $(
+      `<form><input type="search" placeholder="Search..."></form>`
+    );
+    $topPanel.append($columsToggle, $searchform);
+
+    ///////////
+    ///TABLE///
+    ///////////
+    const $table = $(`<table class="theTable"></table>`);
+    const $thead = $(`<thead></thead>`);
+    const $tbody = $(`<tbody></tbody>`);
+    // thead ထည့်ရန်
+    const $theadRow = $("<tr>");
+    cols.forEach((col) => {
+      if (!defaultHide || !defaultHide.includes(col.key)) {
+        var label = col.label ? col.label : col.key;
+        const css = col.css ? `style='${col.css}'` : "";
+        const $th = $(`<th ${css} title="${label}">`).html(` ${label}`);
+        // Attach sorting event listener
+        if (col.sort) {
+          $th.on("click", () => console.log(col.key, !sort.asc));
+        }
+        $theadRow.append($th);
+      }
+    });
+    $thead.html($theadRow);
+
+    // tbodyထည့်
+    if (data) {
+      for (let i = startIndex; i < endIndex; i++) {
+        const row = rows[i];
+        const $tbodyRow = $("<tr></tr>");
+        cols.forEach((col) => {
+          if (!defaultHide.includes(col.key)) {
+            const cell = col.render ? col.render(row) : row[col.key];
+            const css = col.css ? `style='${col.css}'` : "";
+            const $td = $(`<td ${css}></td>`).html(cell);
+            $tbodyRow.append($td);
+          }
+        });
+        $tbody.append($tbodyRow);
+      }
+    } else {
+      for (let i = 0; i < pagLimit; i++) {
+        const $tbodyRow = $("<tr></tr>");
+        cols.forEach((col) => {
+          if (!defaultHide.includes(col.key)) {
+            const css = col.css ? `style='${col.css}'` : "";
+            const $td = $(`<td ${css}></td>`).html(
+              "<div class='skeleton'></div>"
+            );
+            $tbodyRow.append($td);
+          }
+        });
+        $tbody.append($tbodyRow);
+      }
+    }
+    $table.append($thead, $tbody);
+
+    ////////////
+    ///Bottom///
+    ////////////
+
+    const $bottomPanel = $(`<div class="bottomPanel"></div>`);
+    const $rowsperpage = $("<div>").addClass("rowsperpage");
+    const $rowMonitor = $("<div>");
+    const $paganition = $("<ul>").addClass("paganition");
+
+    const $select = $("<select>");
+    [10, 20, 50, 100].forEach((c) => {
+      $select.append(
+        `<option value="${c}" ${c == pagLimit ? "selected" : ""}>${c}</option>`
+      );
+    });
+    $select.on("change", (e) => {
+      currentPig = 0;
+      pagLimit = e.target.value;
+      renderTable(currentData);
+    });
 
     $rowMonitor.html(
       `${startIndex + 1} - ${
@@ -132,136 +181,66 @@ const TheTable = (props) => {
       } of ${rows.length} rows`
     );
 
-    const $table = $("<table>").addClass("theTable");
-    const $caption = $("<caption>").text(props.name);
-    $table.append($caption);
-
-    const $thead = $("<thead>");
-    const $theadRow = $("<tr>");
-    cols.forEach((col) => {
-      console.log();
-      if (!defaultHide || !defaultHide.includes(col.key)) {
-        var label = col.label ? col.label : col.key;
-        const $th = $(
-          `<th ${col.css ? `style=${col.css}` : ""} title="${label}">`
-        ).html(
-          ` ${label}
-          ${sort.key == col.key ? (sort?.asc ? "&#8964" : "&#8963") : ""}`
-        );
-        // Attach sorting event listener
-        if (col.sort) {
-          $th.on("click", () => mySort(col.key, !sort.asc));
-        }
-        $theadRow.append($th);
-      }
-    });
-
-    $thead.append($theadRow);
-    $table.append($thead);
-
-    const $tbody = $("<tbody>");
-    if (loading) {
-      for (let i = 0; i <= pagLimit; i++) {
-        const $tbodyRow = $("<tr>");
-        cols.forEach((col) => {
-          if (!defaultHide || !defaultHide.includes(col.key)) {
-            const $td = $(`<td>`).html("<div class='skeleton'></div>");
-            $tbodyRow.append($td);
-          }
-        });
-        $tbody.append($tbodyRow);
-      }
-    } else {
-      rows.forEach((row, i) => {
-        if (i >= startIndex && i < endIndex) {
-          const $tbodyRow = $("<tr>");
-          cols.forEach((col) => {
-            if (!defaultHide || !defaultHide.includes(col.key)) {
-              var cell = col.render ? col.render(row) : row[col.key];
-              const $td = $(
-                `<td ${row[col.key]?`title='${row[col.key]}'`:""}
-              ${col.className ? `class="${col.className}"` : ""} 
-              ${col.css ? `style="${col.css}"` : ""}>`
-              ).html(cell);
-              $tbodyRow.append($td);
-            }
-          });
-          $tbody.append($tbodyRow);
-        }
+    $paganition.empty();
+    for (let i = 0; i <= Math.floor(rows.length / pagLimit); i++) {
+      const $pigBtn = $(
+        `<li class="${currentPig == i && "active"}">${i + 1}</li>`
+      );
+      $pigBtn.on("click", () => {
+        currentPig = i;
+        renderTable(currentData);
       });
+      $paganition.append($pigBtn);
     }
 
-    $table.append($tbody);
-    $tableContainer.empty().append($table);
+    const $loader = $(
+      "<li id='loading' style='display:none'><span>|</span></li>"
+    );
+    const $btn = $("<li>...More</li>");
+    $btn.on("click", () => loadMore());
+    $paganition.append($loader, $btn);
+    $rowsperpage.append($select, $rowMonitor);
+    $bottomPanel.append($rowsperpage, $paganition);
 
-    var skeleton = $(".skeleton");
-    function changeWidth() {
-      skeleton.each(function () {
-        var randomWidth = Math.floor(Math.random() * (100 - 50 + 1)) + 20;
-
-        // Set the random values
-        $(this).css({
-          width: randomWidth + "%",
-        });
-      });
-    }
-    changeWidth();
-    setInterval(changeWidth, 1000);
-  };
-
-  //function
-  var sort = { key: null, asc: true };
-  function mySort(key, asc) {
-    var sortData = [...rows]; // Make a copy of the data array
-
-    // Define sorting function based on ascending or descending order
-    const sortingFunction = (a, b) => {
-      const aValue = a[key];
-      const bValue = b[key];
-
-      // Handle cases where aValue or bValue are undefined
-      if (aValue === undefined && bValue === undefined) {
-        return 0; // Both values are undefined, no change in order
-      } else if (aValue === undefined) {
-        return asc ? 1 : -1; // a[key] is undefined, it's considered greater if ascending
-      } else if (bValue === undefined) {
-        return asc ? -1 : 1; // b[key] is undefined, it's considered greater if descending
-      }
-
-      // Compare normal values
-      return asc ? (aValue < bValue ? 1 : -1) : aValue > bValue ? 1 : -1;
-    };
-
-    // Apply the sorting function to sort the data
-    sortData.sort(sortingFunction);
-
-    // Update the sort configuration
-    sort = { key: key, asc: asc };
-
-    // Update the rows with the sorted data
-    rows = sortData;
-
-    // Call renderTable() to update the table content
-    return renderTable();
+    $(props.element).empty();
+    $(props.element).addClass("theTableContainer");
+    $(props.element).append($topPanel, $table, $bottomPanel);
+    console.log(currentData);
   }
 
-  var allRows = rows;
-  const mySearch = (word) => {
-    const filteredList = allRows.filter((row) =>
-      cols.some((col) => {
-        const cellValue = row[col.key];
-        if (cellValue !== undefined && cellValue !== null) {
-          return cellValue
-            .toString()
-            .toLowerCase()
-            .includes(word.toLowerCase());
-        }
-        return false;
-      })
-    );
-    rows = filteredList;
-    return renderTable();
+  ////////////////////////////
+  /////////////////////////////
+  ////////////////////////////
+
+  const loadMore = () => {
+    load("query", (err, data) => {
+      if (!err) {
+        currentData = [...currentData, ...data];
+      }
+      renderTable(currentData);
+    });
   };
 
-  return renderTable();
+  // initial
+
+  renderTable(false);
+  var skeleton = $(".skeleton");
+  function changeWidth() {
+    skeleton.each(function () {
+      var randomWidth = Math.floor(Math.random() * (100 - 50 + 1)) + 20;
+
+      // Set the random values
+      $(this).css({
+        width: randomWidth + "%",
+      });
+    });
+  }
+  changeWidth();
+  setInterval(changeWidth, 1000);
+  load("query", (err, data) => {
+    if (!err) {
+      currentData = [...currentData, ...data];
+    }
+    renderTable(currentData);
+  });
 };
