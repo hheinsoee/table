@@ -21,6 +21,7 @@ class TheTable {
     this.props = props;
     this.search = null;
     this.recentlyUpdate = null;
+    this.recentlyRemove = null;
 
     this.init();
   }
@@ -98,6 +99,16 @@ class TheTable {
     this.currentPig = Math.floor(index / this.pagLimit);
     this.recentlyUpdate = index;
     this.renderTable(this.currentData);
+  }
+  deleteIndex(indexToRemove) {
+    this.currentPig = Math.floor(indexToRemove / this.pagLimit);
+    this.recentlyRemove = indexToRemove;
+    this.renderTable(this.currentData);
+    this.currentData.splice(indexToRemove, 1);
+    setTimeout(() => {
+      this.recentlyRemove = null;
+      this.renderTable(this.currentData);
+    }, 1000);
   }
   renderTable(data) {
     var defaultHide = this.props.defaultHide || [];
@@ -219,7 +230,11 @@ class TheTable {
       for (let i = startIndex; i < endIndex; i++) {
         const row = rows[i];
         const $tbodyRow = $(
-          `<tr  ${this.recentlyUpdate == i ? 'class="recentlyUpdate"' : ""}></tr>`
+          `<tr  
+          ${this.recentlyUpdate == i ? 'class="recentlyUpdate"' : ""}
+          ${this.recentlyRemove == i ? 'class="recentlyRemove"' : ""}
+          
+        ></tr>`
         );
         cols.forEach((col) => {
           if (!defaultHide.includes(col.key)) {

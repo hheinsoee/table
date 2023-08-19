@@ -128,7 +128,7 @@ input[type="search"]:focus-visible {
     z-index: 10;
     padding: 5px 10px;
     backdrop-filter: blur(10px);
-    gap:1rem;
+    gap: 1rem;
 }
 .topPanel {
     top: 0;
@@ -156,7 +156,7 @@ input[type="search"]:focus-visible {
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    margin:0px 0.5px;
+    margin: 0px 0.5px;
     /* border: 0.5pt solid #99999981; */
 }
 .columsToggle label span {
@@ -184,14 +184,42 @@ input[type="search"]:focus-visible {
         opacity: 0.5;
     }
 }
-.recentlyUpdate{
-    outline:none;
+.recentlyUpdate {
+    outline: none;
     animation: fadeout 3s;
 }
 @keyframes fadeout {
-    0% {outline:2px solid rgb(69, 97, 148)}
-    60% {outline:2px solid rgb(69, 97, 148)}
-    100% {outline:0px solid rgba(126, 126, 126, 0)}
+    0% {
+        outline: 2px solid rgb(69, 97, 148);
+    }
+    60% {
+        outline: 2px solid rgb(69, 97, 148);
+    }
+    100% {
+        outline: 0px solid rgba(126, 126, 126, 0);
+    }
+}
+.recentlyRemove {
+    overflow: hidden;
+    max-height: 0px!important;
+    animation: removeOut 1s;
+    opacity: 0;
+    background-color: rgb(148, 46, 46);
+}
+
+@keyframes removeOut {
+    0% {
+        outline: 0px solid rgba(126, 126, 126, 0);
+        opacity: 1;
+    }
+    70% {
+        outline: 2px solid rgb(255, 0, 0);
+        max-height: 200px!important;
+    }
+    100% {
+        max-height: 0px!important;
+        opacity: 0;
+    }
 }
 .skeleton {
     animation: blink 2s infinite;

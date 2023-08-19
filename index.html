@@ -34,12 +34,16 @@
     <div>
       <div>
         <button onclick="updateData()">Update</button>
+        <button onclick="deleteData()">Delete</button>
         <div id="theTable"></div>
       </div>
     </div>
     <script>
       function updateData(){
         table.updateIndex(11,{name: 'Change', age:30})
+      }
+      function deleteData(){
+        table.deleteIndex(1)
       }
       var tableSetting = {
         api: "http://localhost:3000/api/users"
