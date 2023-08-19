@@ -184,6 +184,15 @@ input[type="search"]:focus-visible {
         opacity: 0.5;
     }
 }
+.recentlyUpdate{
+    outline:none;
+    animation: fadeout 3s;
+}
+@keyframes fadeout {
+    0% {outline:2px solid rgb(69, 97, 148)}
+    60% {outline:2px solid rgb(69, 97, 148)}
+    100% {outline:0px solid rgba(126, 126, 126, 0)}
+}
 .skeleton {
     animation: blink 2s infinite;
     height: 1rem;

@@ -33,10 +33,14 @@
     <h2>ray table</h2>
     <div>
       <div>
+        <button onclick="updateData()">Update</button>
         <div id="theTable"></div>
       </div>
     </div>
     <script>
+      function updateData(){
+        table.updateIndex(11,{name: 'Change', age:30})
+      }
       var tableSetting = {
         api: "http://localhost:3000/api/users"
         , element: '#theTable'
@@ -95,6 +99,7 @@
 
       // load table with out data
       const table = new TheTable(tableSetting);
+      
       
     </script>
   </div>

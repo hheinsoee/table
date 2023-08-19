@@ -20,6 +20,7 @@ class TheTable {
     this.pagLimit = 10;
     this.props = props;
     this.search = null;
+    this.recentlyUpdate = null;
 
     this.init();
   }
@@ -38,7 +39,9 @@ class TheTable {
   }
   sortFromServer(key, asc) {
     this.currentPig = 0;
-    if(this.search && this.search !== '') {this.filter.search = this.search}
+    if (this.search && this.search !== "") {
+      this.filter.search = this.search;
+    }
     this.filter = {
       ...this.filter,
       sortby: key,
@@ -90,7 +93,12 @@ class TheTable {
     }
     this.renderTable(false), changeWidth(), setInterval(changeWidth, 1000);
   }
-
+  updateIndex(index, data) {
+    this.currentData[index] = { ...this.currentData[index], ...data };
+    this.currentPig = Math.floor(index / this.pagLimit);
+    this.recentlyUpdate = index;
+    this.renderTable(this.currentData);
+  }
   renderTable(data) {
     var defaultHide = this.props.defaultHide || [];
     var cols = [];
@@ -210,7 +218,9 @@ class TheTable {
     if (data) {
       for (let i = startIndex; i < endIndex; i++) {
         const row = rows[i];
-        const $tbodyRow = $("<tr></tr>");
+        const $tbodyRow = $(
+          `<tr  ${this.recentlyUpdate == i ? 'class="recentlyUpdate"' : ""}></tr>`
+        );
         cols.forEach((col) => {
           if (!defaultHide.includes(col.key)) {
             const cell = col.render ? col.render(row) : row[col.key];
@@ -223,11 +233,12 @@ class TheTable {
       }
     } else {
       for (let i = 0; i < this.pagLimit; i++) {
-        const $tbodyRow = $("<tr></tr>");
+        const $tbodyRow = $(`<tr></tr>`);
         cols.forEach((col) => {
           if (!defaultHide.includes(col.key)) {
             const css = col.css ? `style='${col.css}'` : "";
-            const $td = $(`<td ${css}></td>`).html(
+            const className = col.className ? `class='${col.className}'` : "";
+            const $td = $(`<td ${css} ${className}></td>`).html(
               "<div class='skeleton'></div>"
             );
             $tbodyRow.append($td);
