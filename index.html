@@ -67,16 +67,16 @@
             , render: (data) => `${data.rs ? "Relationship" : "Single"}`
           }
           , {
-            key: 'function'
-            , label: 'function'
-            , render: (data) => `${data.age > 20 ? '<span style="color:red">Old</span>' : '<span style="color:green">Young</span>'}`
-          , }
-          , {
             key: 'create_time'
             , label: 'Join on'
             , render: (data) => moment(data.create_time)
               .format("DD-MMM YYYY")
           }
+          , {
+            key: 'a'
+            , label: 'Old or Young'
+            , render: (data) => `${data.age > 20 ? '<span style="color:red">Old</span>' : '<span style="color:green">Young</span>'}`
+          , }
           , {
             key: 'action'
             , label: ''

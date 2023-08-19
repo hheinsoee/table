@@ -23,6 +23,7 @@ class TheTable {
     this.recentlyAdd = null;
     this.recentlyUpdate = null;
     this.recentlyRemove = null;
+    this.defaultHide = this.props.defaultHide || [];
 
     this.init();
   }
@@ -73,7 +74,7 @@ class TheTable {
     });
   }
   loadMore() {
-    this.clearRecentStatus()
+    this.clearRecentStatus();
     this.load({ ...this.filter, page: this.page + 1 }, (err, data) => {
       if (!err) {
         this.currentData = [...this.currentData, ...data];
@@ -83,7 +84,7 @@ class TheTable {
     });
   }
   loadingTable() {
-    this.clearRecentStatus()
+    this.clearRecentStatus();
     this.executeFunction = false;
     this.page = 1;
     function changeWidth() {
@@ -130,20 +131,25 @@ class TheTable {
     }, 1000);
   }
   renderTable(data) {
-    var defaultHide = this.props.defaultHide || [];
     var cols = [];
     var rows = $.isArray(data) ? data : [];
 
     const allKeys = rows.reduce((keys, obj) => {
-      return keys.concat(Object.keys(obj));
+      if (typeof obj === "object") {
+        const objectKeys = Object.keys(obj);
+        return keys.concat(objectKeys.filter(key => typeof obj[key] !== "object"));
+      }
+      return keys;
     }, []);
-
-    const startIndex = this.currentPig * this.pagLimit;
-    const endIndex = Math.min(startIndex + this.pagLimit, rows.length);
+    
 
     // Remove duplicates
     const uniqueKeys = [...new Set(allKeys)];
+    // console.log(uniqueKeys)
 
+
+    const startIndex = this.currentPig * this.pagLimit;
+    const endIndex = Math.min(startIndex + this.pagLimit, rows.length);
     uniqueKeys.forEach((key) => {
       var colSetting =
         this.props.cols && this.props.cols.find((col) => col.key == key);
@@ -175,7 +181,7 @@ class TheTable {
       const $checkBox = $(`
         <label title="${col.label || col.key}">
           <input type="checkbox" ${
-            !defaultHide.includes(col.key) ? "checked" : ""
+            !this.defaultHide.includes(col.key) ? "checked" : ""
           } />
           <span>${col.label || col.key}</span>
         </label>
@@ -183,10 +189,11 @@ class TheTable {
 
       $checkBox.addClass("noselect");
       $checkBox.on("change", () => {
-        if (defaultHide.includes(col.key)) {
-          defaultHide.splice(defaultHide.indexOf(col.key), 1);
+        if (this.defaultHide.includes(col.key)) {
+          this.defaultHide.splice(this.defaultHide.indexOf(col.key), 1);
         } else {
-          defaultHide.push(col.key);
+          this.defaultHide.push(col.key);
+          console.log(this.defaultHide);
         }
         this.renderTable(data);
       });
@@ -223,7 +230,7 @@ class TheTable {
     const $theadRow = $("<tr>");
     cols.forEach((col) => {
       // console.log(sort.key,col.key)
-      if (!defaultHide || !defaultHide.includes(col.key)) {
+      if (!this.defaultHide || !this.defaultHide.includes(col.key)) {
         var label = col.label ? col.label : col.key;
         const css = col.css ? `style='${col.css}'` : "";
         const $th = $(`<th ${css} title="${label}">`).html(
@@ -257,7 +264,7 @@ class TheTable {
         ></tr>`
         );
         cols.forEach((col) => {
-          if (!defaultHide.includes(col.key)) {
+          if (!this.defaultHide.includes(col.key)) {
             const cell = col.render ? col.render(row) : row[col.key];
             const css = col.css ? `style='${col.css}'` : "";
             const $td = $(`<td ${css}></td>`).html(cell);
@@ -270,7 +277,7 @@ class TheTable {
       for (let i = 0; i < this.pagLimit; i++) {
         const $tbodyRow = $(`<tr></tr>`);
         cols.forEach((col) => {
-          if (!defaultHide.includes(col.key)) {
+          if (!this.defaultHide.includes(col.key)) {
             const css = col.css ? `style='${col.css}'` : "";
             const className = col.className ? `class='${col.className}'` : "";
             const $td = $(`<td ${css} ${className}></td>`).html(
@@ -306,6 +313,7 @@ class TheTable {
     });
     $select.on("change", (e) => {
       this.currentPig = 0;
+      this.clearRecentStatus();
       this.pagLimit = parseInt(e.target.value);
       this.renderTable(this.currentData);
     });
@@ -317,21 +325,66 @@ class TheTable {
     );
 
     $paganition.empty();
-    for (let i = 0; i <= Math.floor(rows.length / this.pagLimit); i++) {
-      const $pigBtn = $(
-        `<li class="${this.currentPig == i && "active"}">${i + 1}</li>`
-      );
-      $pigBtn.on("click", () => {
-        this.currentPig = i;
-        this.renderTable(this.currentData);
+    var numOfPig = Math.ceil(rows.length / this.pagLimit) - 1;
+    if (numOfPig > 6) {
+      var show = [0];
+
+      if (this.currentPig > 1) {
+        show.push(this.currentPig - 1);
+      }
+      if (this.currentPig > 0 && this.currentPig < numOfPig) {
+        show.push(this.currentPig);
+      }
+      if (this.currentPig < numOfPig - 1) {
+        show.push(this.currentPig + 1);
+      }
+      show.push(numOfPig);
+
+      show.forEach((p, i) => {
+        const $pigBtn = $(
+          `<li class="${this.currentPig == p && "active"}">${p + 1}</li>`
+        );
+        $pigBtn.on("click", () => {
+          this.currentPig = p;
+          this.clearRecentStatus();
+          this.renderTable(this.currentData);
+        });
+
+        if (
+          (i == show.length - 1 && this.currentPig < numOfPig - 2) ||
+          (this.currentPig == p + 1 && this.currentPig > 2)
+        ) {
+          $pigBtn.html(`<small style="opacity:0.4">... ${p} </small>${p + 1}`);
+        }
+        $paganition.append($pigBtn);
+
+        if (
+          (i == 0 && this.currentPig > 2) ||
+          (this.currentPig == p - 1 && this.currentPig < numOfPig - 2)
+        ) {
+          $pigBtn.html(
+            `${p + 1}<small style="opacity:0.4"> ${p + 2} ...</small>`
+          );
+        }
       });
-      $paganition.append($pigBtn);
+    } else {
+      for (let i = 0; i <= numOfPig; i++) {
+        const $pigBtn = $(
+          `<li class="${this.currentPig == i && "active"}">${i + 1}</li>`
+        );
+        $pigBtn.on("click", () => {
+          this.currentPig = i;
+          this.clearRecentStatus();
+          this.renderTable(this.currentData);
+        });
+        $paganition.append($pigBtn);
+      }
     }
 
     const $loader = $(
       "<li id='loading' style='display:none'><span>|</span></li>"
     );
-    const $btn = $("<li>...More</li>");
+    const $btn = $("<li>... More</li>");
     $btn.on("click", () => this.loadMore());
     $paganition.append($loader, $btn);
     $rowsperpage.append($select, $rowMonitor);
