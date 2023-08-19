@@ -36,8 +36,10 @@ class TheTable {
     });
   }
 
-  clear() {
-    this.currentData = [];
+  clearRecentStatus() {
+    this.recentlyAdd = null;
+    this.recentlyUpdate = null;
+    this.recentlyRemove = null;
   }
   sortFromServer(key, asc) {
     this.currentPig = 0;
@@ -71,6 +73,7 @@ class TheTable {
     });
   }
   loadMore() {
+    this.clearRecentStatus()
     this.load({ ...this.filter, page: this.page + 1 }, (err, data) => {
       if (!err) {
         this.currentData = [...this.currentData, ...data];
@@ -80,6 +83,7 @@ class TheTable {
     });
   }
   loadingTable() {
+    this.clearRecentStatus()
     this.executeFunction = false;
     this.page = 1;
     function changeWidth() {
@@ -99,9 +103,8 @@ class TheTable {
     if (this.currentData[index]) {
       this.currentData[index] = { ...this.currentData[index], ...data };
       this.currentPig = Math.floor(index / this.pagLimit);
+      this.clearRecentStatus();
       this.recentlyUpdate = index;
-      this.recentlyRemove = null;
-      this.recentlyAdd = null;
       this.renderTable(this.currentData);
     } else {
       console.log(`index [${index}] is not found`);
@@ -111,20 +114,18 @@ class TheTable {
   addData(data) {
     this.currentData = [data, ...this.currentData];
     this.currentPig = 0;
+    this.clearRecentStatus();
     this.recentlyAdd = 0;
-    this.recentlyUpdate = null;
-    this.recentlyRemove = null;
     this.renderTable(this.currentData);
   }
   deleteIndex(indexToRemove) {
     this.currentPig = Math.floor(indexToRemove / this.pagLimit);
+    this.clearRecentStatus();
     this.recentlyRemove = indexToRemove;
-    this.recentlyUpdate = null;
-    this.recentlyAdd = null;
     this.renderTable(this.currentData);
     this.currentData.splice(indexToRemove, 1);
     setTimeout(() => {
-      this.recentlyRemove = null;
+      this.clearRecentStatus();
       this.renderTable(this.currentData);
     }, 1000);
   }
