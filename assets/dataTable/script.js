@@ -15,14 +15,11 @@ class TheTable {
   constructor(props) {
     this.filter = {};
     this.currentData = [];
-    this.sort = {
-      key: null,
-      asc: false,
-    };
     this.page = 1;
     this.currentPig = 0;
     this.pagLimit = 10;
     this.props = props;
+    this.search = null;
 
     this.init();
   }
@@ -41,25 +38,42 @@ class TheTable {
   }
   sortFromServer(key, asc) {
     this.currentPig = 0;
-    this.sort = {
-      key: key,
+    if(this.search && this.search !== '') {this.filter.search = this.search}
+    this.filter = {
+      ...this.filter,
+      sortby: key,
       asc: asc,
     };
     this.loadingTable();
-    this.load(
-      {
-        sortby: key,
-        asc: asc,
-      },
-      (err, data) => {
-        if (!err) {
-          this.currentData = [...data];
-          this.renderTable(this.currentData);
-        }
+    this.load(this.filter, (err, data) => {
+      if (!err) {
+        this.currentData = [...data];
+        this.renderTable(this.currentData);
       }
-    );
+    });
   }
-
+  searchFromServer(word) {
+    this.currentPig = 0;
+    this.filter = {
+      search: word,
+    };
+    this.loadingTable();
+    this.load(this.filter, (err, data) => {
+      if (!err) {
+        this.currentData = [...data];
+      }
+      this.renderTable(this.currentData);
+    });
+  }
+  loadMore() {
+    this.load({ ...this.filter, page: this.page + 1 }, (err, data) => {
+      if (!err) {
+        this.currentData = [...this.currentData, ...data];
+      }
+      this.page = this.page + 1;
+      this.renderTable(this.currentData);
+    });
+  }
   loadingTable() {
     this.executeFunction = false;
     this.page = 1;
@@ -88,11 +102,6 @@ class TheTable {
 
     const startIndex = this.currentPig * this.pagLimit;
     const endIndex = Math.min(startIndex + this.pagLimit, rows.length);
-    console.log("currentPig", this.currentPig);
-    console.log("start", startIndex);
-    console.log("end", endIndex);
-    console.log("all", rows.length);
-    console.log('page limit ', this.pagLimit)
 
     // Remove duplicates
     const uniqueKeys = [...new Set(allKeys)];
@@ -148,24 +157,21 @@ class TheTable {
     });
 
     const $searchform = $(
-      `<form class="search"><input type="search" placeholder="Search..." value="${
-        this.filter.search || ""
-      }"><button>&#128269;</button></form>`
+      `<form class="search"><button>&#128269;</button></form>`
     );
+    const $searchInput = $(
+      `<input type="search" placeholder="Search..." value="${
+        this.filter.search || ""
+      }">`
+    );
+    $searchInput.on("change", () => {
+      this.search = $searchInput.val();
+    });
+    $searchform.html($searchInput);
     $searchform.on("submit", (event) => {
       event.preventDefault(); // Prevent the default form submission
       const inputValue = $searchform.find("input").val();
-      this.currentPig = 0;
-      this.filter = {
-        search: inputValue,
-      };
-      this.loadingTable();
-      this.load(this.filter, (err, data) => {
-        if (!err) {
-          this.currentData = [...data];
-        }
-        this.renderTable(this.currentData);
-      });
+      this.searchFromServer(inputValue);
     });
     $topPanel.append($columsToggle, $searchform);
 
@@ -184,8 +190,8 @@ class TheTable {
         const css = col.css ? `style='${col.css}'` : "";
         const $th = $(`<th ${css} title="${label}">`).html(
           ` ${label} ${
-            this.sort.key == col.key
-              ? this.sort?.asc
+            this.filter.sortby == col.key
+              ? this.filter?.asc
                 ? "&#8964"
                 : "&#8963"
               : ""
@@ -193,7 +199,7 @@ class TheTable {
         );
         // Attach sorting event listener
         if (col.sort && data) {
-          $th.on("click", () => this.sortFromServer(col.key, !this.sort.asc));
+          $th.on("click", () => this.sortFromServer(col.key, !this.filter.asc));
         }
         $theadRow.append($th);
       }
@@ -280,16 +286,7 @@ class TheTable {
       "<li id='loading' style='display:none'><span>|</span></li>"
     );
     const $btn = $("<li>...More</li>");
-    $btn.on("click", () => {
-      console.log(this.filter);
-      this.load({ ...this.filter, page: this.page + 1 }, (err, data) => {
-        if (!err) {
-          this.currentData = [...this.currentData, ...data];
-        }
-        this.page = this.page + 1;
-        this.renderTable(this.currentData);
-      });
-    });
+    $btn.on("click", () => this.loadMore());
     $paganition.append($loader, $btn);
     $rowsperpage.append($select, $rowMonitor);
     $bottomPanel.append($rowsperpage, $paganition);
