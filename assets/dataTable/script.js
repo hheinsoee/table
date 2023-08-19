@@ -95,14 +95,21 @@ class TheTable {
     this.renderTable(false), changeWidth(), setInterval(changeWidth, 1000);
   }
   updateIndex(index, data) {
-    this.currentData[index] = { ...this.currentData[index], ...data };
-    this.currentPig = Math.floor(index / this.pagLimit);
-    this.recentlyUpdate = index;
-    this.renderTable(this.currentData);
+    if (this.currentData[index]) {
+      this.currentData[index] = { ...this.currentData[index], ...data };
+      this.currentPig = Math.floor(index / this.pagLimit);
+      this.recentlyUpdate = index;
+      this.recentlyRemove = null;
+      this.renderTable(this.currentData);
+    }
+    else{
+      console.log(`index [${index}] is not found`)
+    }
   }
   deleteIndex(indexToRemove) {
     this.currentPig = Math.floor(indexToRemove / this.pagLimit);
     this.recentlyRemove = indexToRemove;
+    this.recentlyUpdate = null;
     this.renderTable(this.currentData);
     this.currentData.splice(indexToRemove, 1);
     setTimeout(() => {
