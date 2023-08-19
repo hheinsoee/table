@@ -33,6 +33,7 @@
     <h2>ray table</h2>
     <div>
       <div>
+        <button onclick="createNew()">Add New</button>
         <button onclick="updateData()">Update</button>
         <button onclick="deleteData()">Delete</button>
         <div id="theTable"></div>
@@ -40,10 +41,13 @@
     </div>
     <script>
       function updateData(){
-        table.updateIndex(11,{name: 'Change', age:30})
+        table.updateIndex(2,{name: 'Change', age:30})
       }
       function deleteData(){
         table.deleteIndex(1)
+      }
+      function createNew(){
+        table.addData({id: 12, age: 18, name: 'Oxy Thu', rs: false, profile_image_url: 'https://avatars.githubusercontent.com/u/65397559?v=4'})
       }
       var tableSetting = {
         api: "http://localhost:3000/api/users"

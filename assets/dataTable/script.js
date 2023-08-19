@@ -20,6 +20,7 @@ class TheTable {
     this.pagLimit = 10;
     this.props = props;
     this.search = null;
+    this.recentlyAdd = null;
     this.recentlyUpdate = null;
     this.recentlyRemove = null;
 
@@ -100,16 +101,26 @@ class TheTable {
       this.currentPig = Math.floor(index / this.pagLimit);
       this.recentlyUpdate = index;
       this.recentlyRemove = null;
+      this.recentlyAdd = null;
       this.renderTable(this.currentData);
+    } else {
+      console.log(`index [${index}] is not found`);
     }
-    else{
-      console.log(`index [${index}] is not found`)
-    }
+  }
+
+  addData(data) {
+    this.currentData = [data, ...this.currentData];
+    this.currentPig = 0;
+    this.recentlyAdd = 0;
+    this.recentlyUpdate = null;
+    this.recentlyRemove = null;
+    this.renderTable(this.currentData);
   }
   deleteIndex(indexToRemove) {
     this.currentPig = Math.floor(indexToRemove / this.pagLimit);
     this.recentlyRemove = indexToRemove;
     this.recentlyUpdate = null;
+    this.recentlyAdd = null;
     this.renderTable(this.currentData);
     this.currentData.splice(indexToRemove, 1);
     setTimeout(() => {
@@ -238,6 +249,7 @@ class TheTable {
         const row = rows[i];
         const $tbodyRow = $(
           `<tr  
+          ${this.recentlyAdd == i ? 'class="recentlyAdd"' : ""}
           ${this.recentlyUpdate == i ? 'class="recentlyUpdate"' : ""}
           ${this.recentlyRemove == i ? 'class="recentlyRemove"' : ""}
           

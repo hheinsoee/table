@@ -184,16 +184,25 @@ input[type="search"]:focus-visible {
         opacity: 0.5;
     }
 }
+.recentlyAdd {
+    outline: none;
+    animation: fadeoutAdd 3s;
+}
+@keyframes fadeoutAdd {
+    0% {
+        outline: 2px solid rgb(45, 153, 41);
+    }
+    100% {
+        outline: 0px solid rgba(126, 126, 126, 0);
+    }
+}
 .recentlyUpdate {
     outline: none;
     animation: fadeout 3s;
 }
 @keyframes fadeout {
     0% {
-        outline: 2px solid rgb(69, 97, 148);
-    }
-    60% {
-        outline: 2px solid rgb(69, 97, 148);
+        outline: 2px solid rgb(196, 169, 16);
     }
     100% {
         outline: 0px solid rgba(126, 126, 126, 0);
