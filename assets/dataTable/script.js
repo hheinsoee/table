@@ -88,6 +88,11 @@ class TheTable {
 
     const startIndex = this.currentPig * this.pagLimit;
     const endIndex = Math.min(startIndex + this.pagLimit, rows.length);
+    console.log("currentPig", this.currentPig);
+    console.log("start", startIndex);
+    console.log("end", endIndex);
+    console.log("all", rows.length);
+    console.log('page limit ', this.pagLimit)
 
     // Remove duplicates
     const uniqueKeys = [...new Set(allKeys)];
@@ -249,7 +254,7 @@ class TheTable {
     });
     $select.on("change", (e) => {
       this.currentPig = 0;
-      this.pagLimit = e.target.value;
+      this.pagLimit = parseInt(e.target.value);
       this.renderTable(this.currentData);
     });
 
@@ -276,7 +281,8 @@ class TheTable {
     );
     const $btn = $("<li>...More</li>");
     $btn.on("click", () => {
-      this.load({ page: this.page + 1 }, (err, data) => {
+      console.log(this.filter);
+      this.load({ ...this.filter, page: this.page + 1 }, (err, data) => {
         if (!err) {
           this.currentData = [...this.currentData, ...data];
         }

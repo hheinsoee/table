@@ -82,10 +82,15 @@
           , {
             key: 'action'
             , label: ''
-            , render: (data) => `<button onclick='alert("${data.age > 20 ? 'U ' : 'Mg '} ${data.name} is ${data.age} years old.")'>click</button>`
+            , render: (data) => `<button onclick='console.log(${JSON.stringify(data)})'>click</button>`
+          }
+          , {
+            key: 'edit'
+            , label: 'edit'
+            , render: (data) => `<button onclick='alert("${data.age > 20 ? 'U ' : 'Mg '} ${data.name} is ${data.age} years old.")'>edit</button>`
           }
         ]
-        , defaultHide: ['action']
+        , defaultHide: ['edit','action']
       };
 
       // load table with out data
