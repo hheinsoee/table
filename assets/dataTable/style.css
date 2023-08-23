@@ -30,7 +30,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    word-break: break-all;
+    word-break: break-all;  
 }
 .columsToggle{
     font-size: small;

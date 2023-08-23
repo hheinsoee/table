@@ -19,82 +19,72 @@
     <h2>ray table</h2>
     <div>
       <div>
-        <button onclick="createNew()">Add New</button>
+        <!-- <button onclick="createNew()">Add New</button>
         <button onclick="updateData()">Update</button>
-        <button onclick="deleteData()">Delete</button>
+        <button onclick="deleteData()">Delete</button> -->
         <div id="theTable"></div>
       </div>
     </div>
     <script>
-      function updateData(){
-        table.updateIndex(2,{name: 'Change', age:30})
+      function updateData() {
+        table.updateIndex(2, {
+          name: 'Change'
+          , age: 30
+        })
       }
-      function deleteData(){
+
+      function deleteData() {
         table.deleteIndex(1)
       }
-      function createNew(){
-        table.addData({id: 12, age: 18, name: 'Oxy Thu', rs: false, profile_image_url: 'https://avatars.githubusercontent.com/u/65397559?v=4'})
+
+      function createNew() {
+        table.addData({
+          id: 12
+          , age: 18
+          , name: 'Oxy Thu'
+          , rs: false
+          , profile_image_url: 'https://avatars.githubusercontent.com/u/65397559?v=4'
+        })
       }
       var tableSetting = {
-        api: "http://localhost:3000/api/users"
+        api: `https://channelmyanmar.org/wp-json/wp/v2/posts/?_fields=slug,id,title,date,_links,excerpt,categories&_embed=wp:featuredmedia&${window.location.search.substring(1)}`
         , element: '#theTable'
           // , data: users
         , caption: "user table"
         , cols: [{
-            key: 'id'
-            , label: 'ID'
-            , css: 'width:2rem; text-align:right'
+            key: 'image'
+            , label: "Poster"
+            , render: (r) => {
+              var media = r._embedded['wp:featuredmedia'] == undefined ? null : r._embedded['wp:featuredmedia'][0].media_details;
+              var errPhotoUrl = 'https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg';
+              var photoUrl = media ? media.sizes.medium?.source_url : errPhotoUrl;
+              return `<img src="${photoUrl}"  alt="${r.title.rendered}" style="height:80px;aspect-ratio: 2 / 3;" onerror="this.src='${errPhotoUrl}';" />`
+            }
           }
           , {
-            key: 'profile_image_url'
-            , label: "Image"
-            , render: (data) => data.profile_image_url ? `<img src="${data.profile_image_url}" class="avatar" referrerpolicy="no-referrer">` : ""
-            , css: 'width:40px;'
+            key: 'date'
+            , label: 'post on'
+            , render: (data) => moment(data.date)
+              .format("DD-MMM YYYY<br/>hh:mm a")
           }
           , {
-            key: 'name'
-            , label: 'Full Name'
-            , render: (data) => `${data.name}`
-          }
-          , {
-            key: 'age'
-            , label: 'Age'
-            , render: (data) => `${data.age} year`
-          }
-          , {
-            key: 'rs'
-            , label: 'RS'
-            , render: (data) => `${data.rs ? "Relationship" : "Single"}`
-          }
-          , {
-            key: 'create_time'
-            , label: 'Join on'
-            , render: (data) => moment(data.create_time)
-              .format("DD-MMM YYYY")
-          }
-          , {
-            key: 'a'
-            , label: 'Old or Young'
-            , render: (data) => `${data.age > 20 ? '<span style="color:red">Old</span>' : '<span style="color:green">Young</span>'}`
-          , }
-          , {
-            key: 'action'
-            , label: ''
-            , render: (data) => `<button onclick='console.log(${JSON.stringify(data)})'>click</button>`
-          }
-          , {
-            key: 'edit'
-            , label: 'edit'
-            , render: (data) => `<button onclick='alert("${data.age > 20 ? 'U ' : 'Mg '} ${data.name} is ${data.age} years old.")'>edit</button>`
+            key: 'slug'
+            , sort: false
+            , label: 'movie Name'
+            , render: (r) => {
+              var link = `https://channelmyanmar.org/blog/${r.slug}`;
+              return `
+              ${r.title.rendered}<br/>
+              <a class="h4" target="_blank" href="${link}">${link}</a>
+              `
+            }
           }
         ]
-        , defaultHide: ['edit','action']
+        , defaultHide: ['id']
       };
 
       // load table with out data
       const table = new TheTable(tableSetting);
-      
-      
     </script>
   </div>
 </body>

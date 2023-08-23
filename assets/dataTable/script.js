@@ -1,5 +1,5 @@
 // ===============================================
-// script.js - JavaScript for Data Table
+// script.js - Javorderript for Data Table
 // ===============================================
 //
 // This script provides functionality for a data table.
@@ -42,15 +42,15 @@ class TheTable {
     this.recentlyUpdate = null;
     this.recentlyRemove = null;
   }
-  sortFromServer(key, asc) {
+  sortFromServer(key, order) {
     this.currentPig = 0;
     if (this.search && this.search !== "") {
       this.filter.search = this.search;
     }
     this.filter = {
       ...this.filter,
-      sortby: key,
-      asc: asc,
+      orderby: key,
+      order: order,
     };
     this.loadingTable();
     this.load(this.filter, (err, data) => {
@@ -83,22 +83,25 @@ class TheTable {
       this.renderTable(this.currentData);
     });
   }
+
+  changeWidth() {
+    // console.log('change')
+    var skeleton = $(".skeleton");
+    skeleton.each(function () {
+      var randomWidth = Math.floor(Math.random() * (100 - 50 + 1)) + 20;
+
+      // Set the random values
+      $(this).css({
+        width: randomWidth + "%",
+      });
+    });
+  }
+
   loadingTable() {
     this.clearRecentStatus();
     this.executeFunction = false;
     this.page = 1;
-    function changeWidth() {
-      var skeleton = $(".skeleton");
-      skeleton.each(function () {
-        var randomWidth = Math.floor(Math.random() * (100 - 50 + 1)) + 20;
-
-        // Set the random values
-        $(this).css({
-          width: randomWidth + "%",
-        });
-      });
-    }
-    this.renderTable(false), changeWidth(), setInterval(changeWidth, 1000);
+    this.renderTable(false), this.changeWidth();
   }
   updateIndex(index, data) {
     if (this.currentData[index]) {
@@ -131,22 +134,23 @@ class TheTable {
     }, 1000);
   }
   renderTable(data) {
+    // clearInterval(this.loadingTable().everysecond)
     var cols = [];
     var rows = $.isArray(data) ? data : [];
 
     const allKeys = rows.reduce((keys, obj) => {
       if (typeof obj === "object") {
         const objectKeys = Object.keys(obj);
-        return keys.concat(objectKeys.filter(key => typeof obj[key] !== "object"));
+        return keys.concat(
+          objectKeys.filter((key) => typeof obj[key] !== "object")
+        );
       }
       return keys;
     }, []);
-    
 
     // Remove duplicates
     const uniqueKeys = [...new Set(allKeys)];
     // console.log(uniqueKeys)
-
 
     const startIndex = this.currentPig * this.pagLimit;
     const endIndex = Math.min(startIndex + this.pagLimit, rows.length);
@@ -235,8 +239,8 @@ class TheTable {
         const css = col.css ? `style='${col.css}'` : "";
         const $th = $(`<th ${css} title="${label}">`).html(
           ` ${label} ${
-            this.filter.sortby == col.key
-              ? this.filter?.asc
+            this.filter.orderby == col.key
+              ? this.filter?.order == "asc"
                 ? "&#8964"
                 : "&#8963"
               : ""
@@ -244,7 +248,12 @@ class TheTable {
         );
         // Attach sorting event listener
         if (col.sort && data) {
-          $th.on("click", () => this.sortFromServer(col.key, !this.filter.asc));
+          $th.on("click", () =>
+            this.sortFromServer(
+              col.key,
+              this.filter.order == "asc" ? "desc" : "asc"
+            )
+          );
         }
         $theadRow.append($th);
       }
@@ -398,6 +407,7 @@ class TheTable {
 
   init() {
     this.loadingTable();
+    setInterval(this.changeWidth, 1000);
     this.load({}, (err, data) => {
       if (!err) {
         this.currentData = [...this.currentData, ...data];
