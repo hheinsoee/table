@@ -47,7 +47,7 @@
         })
       }
       var tableSetting = {
-        api: `https://channelmyanmar.org/wp-json/wp/v2/posts/?_fields=slug,id,title,date,_links,excerpt,categories&_embed=wp:featuredmedia&${window.location.search.substring(1)}`
+        api: `https://burmese.dvb.no/wp-json/wp/v2/posts/?_fields=link,id,title,date,_links,excerpt,categories&_embed=wp:featuredmedia&${window.location.search.substring(1)}`
         , element: '#theTable'
           // , data: users
         , caption: "user table"
@@ -57,8 +57,8 @@
             , render: (r) => {
               var media = r._embedded['wp:featuredmedia'] == undefined ? null : r._embedded['wp:featuredmedia'][0].media_details;
               var errPhotoUrl = 'https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg';
-              var photoUrl = media ? media.sizes.medium?.source_url : errPhotoUrl;
-              return `<img src="${photoUrl}"  alt="${r.title.rendered}" style="height:80px;aspect-ratio: 2 / 3;" onerror="this.src='${errPhotoUrl}';" />`
+              var photoUrl = media ? `https://burmese.dvb.no/${media.sizes.thumbnail?.source_url}` : errPhotoUrl;
+              return `<img src="${photoUrl}"  alt="${r.title.rendered}" style="height:80px;aspect-ratio: 5 / 3;object-fit:cover" onerror="this.src='${errPhotoUrl}';" />`
             }
           }
           , {
@@ -68,11 +68,11 @@
               .format("DD-MMM YYYY<br/>hh:mm a")
           }
           , {
-            key: 'slug'
+            key: 'link'
             , sort: false
             , label: 'movie Name'
             , render: (r) => {
-              var link = `https://channelmyanmar.org/blog/${r.slug}`;
+              var link = r.link;
               return `
               ${r.title.rendered}<br/>
               <a class="h4" target="_blank" href="${link}">${link}</a>
