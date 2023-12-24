@@ -57,7 +57,7 @@
             , render: (r) => {
               var media = r._embedded['wp:featuredmedia'] == undefined ? null : r._embedded['wp:featuredmedia'][0].media_details;
               var errPhotoUrl = 'https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg';
-              var photoUrl = media ? `https://burmese.dvb.no/${media.sizes.thumbnail?.source_url}` : errPhotoUrl;
+              var photoUrl = media ? `https://myanmarenduser.com/${media.sizes.thumbnail?.source_url}` : errPhotoUrl;
               return `<img src="${photoUrl}"  alt="${r.title.rendered}" style="height:80px;aspect-ratio: 5 / 3;object-fit:cover" onerror="this.src='${errPhotoUrl}';" />`
             }
           }
